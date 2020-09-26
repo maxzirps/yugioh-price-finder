@@ -2,7 +2,10 @@
   "name": "yugioh-price-finder",
   "version": "0.1.0",
   "description": "Find the prices of your yugioh cards",
-  "author": {"name": "Maximilian Zirps", "url": "https://github.com/maxzirps/yugioh-price-finder"},
+  "author": {
+    "name": "Maximilian Zirps",
+    "url": "https://github.com/maxzirps/yugioh-price-finder"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,9 +13,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/core": "^1.0.0-rc.4",
     "next": "9.5.3",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "tesseract.js": "^2.1.3"
   },
   "devDependencies": {
     "@types/node": "^14.11.2",
