@@ -1,9 +1,7 @@
-import { ChakraProvider } from "@chakra-ui/core";
+import "../styles/index.css";
 
-const MyApp = ({ Component, pageProps }) => (
-  <ChakraProvider resetCSS>
-    <Component {...pageProps} />
-  </ChakraProvider>
-);
+function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />;
+}
 
 export default MyApp;

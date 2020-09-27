@@ -1,81 +1,80 @@
 import Head from "next/head";
-import { Center, Heading, Flex, Button, Box, Text, Image } from "@chakra-ui/core";
-import Tesseract from "tesseract.js";
+import { createWorker } from "tesseract.js";
 import { useState } from "react";
+const worker = createWorker({
+  logger: (m) => console.log(m),
+});
 
-const extractId = () => {
-  Tesseract.recognize(
-    "https://tesseract.projectnaptha.com/img/eng_bw.png",
-    "eng",
-    { logger: (m) => console.log(m) }
-  ).then(({ data: { text } }) => {
+const extractId = (imgBlob) => {
+  (async () => {
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    await worker.setParameters({
+      tessedit_char_whitelist: "0123456789",
+    });
+    const {
+      data: { text },
+    } = await worker.recognize(imgBlob);
     console.log(text);
-  });
+    await worker.terminate();
+  })();
 };
 
 export default function Home() {
   const [cardImg, setCardImg] = useState<string>();
   const [cardId, setCardId] = useState<Number>();
 
-  const onImageChange = event => {
+  const onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       let img = event.target.files[0];
-      setCardImg(URL.createObjectURL(img))
+      setCardImg(URL.createObjectURL(img));
     }
   };
 
   return (
-    <div>
+    <>
       <Head>
         <title>Yugioh Price Finder</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+          href="https://fonts.googleapis.com/css?family=Roboto:300|Domine:400"
+          rel="stylesheet"
+        />
       </Head>
 
-      <main>
-        <Center w="100vw" p="3rem">
-          <Flex direction="column">
-            <Box p="4">
-              <Heading>Yugioh Price Finder</Heading>
-            </Box>
-            {/* <Spacer/> */}
-            <Box p="4">
-              <Center>
-                <label htmlFor="cardImg">Select the file:</label>
-                <input
-                  type="file"
-                  id="cardImg"
-                  name="cardImg"
-                  accept="image/png, image/jpeg"
-                  onChange={onImageChange}
-                />
-              </Center>
-            </Box>
-            <Box p="4" boxSize="sm">
-              <Center>
-              <Image src="https://bit.ly/sage-adebayo" alt="Segun Adebayo" />
-              </Center>
-            </Box>
-            <Box p="4">
-              <Center>
-                <Button
-                  colorScheme="blue"
-                  isDisabled={cardImg === undefined}
-                  onClick={() => console.log(cardImg)}
-                >
-                  Find price
-                </Button>
-              </Center>
-            </Box>
-            <Box p="4">
-              <Center>
-                <Text>{cardId}</Text>
-              </Center>
-            </Box>
-          </Flex>
-        </Center>
-      </main>
-
-      <footer></footer>
-    </div>
+      <div className="w-4/6 m-auto roboto-300 text-center">
+        <main>
+          <div className="conatiner">
+            <h1 className="domine-400 text-xl my-6 border-b-4 border-indigo-500">
+              Yugioh Price Finder
+            </h1>
+          </div>
+          <div className="py-6">
+            <label htmlFor="cardImg">Select a file</label>
+            <input
+              type="file"
+              id="cardImg"
+              name="cardImg"
+              accept="image/png, image/jpeg"
+              onChange={onImageChange}
+            />
+          </div>
+          {cardImg && <img src={cardImg}></img>}
+          <div className="py-6">
+            <button
+              disabled={cardImg === undefined}
+              onClick={() => extractId(cardImg)}
+              type="button"
+              className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+            >
+              Find price
+            </button>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }
