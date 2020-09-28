@@ -1,77 +1,34 @@
-import Head from "next/head";
-import { createWorker } from "tesseract.js";
-import { useState } from "react";
-const worker = createWorker({
-  logger: (m) => console.log(m),
-});
-
-const extractId = (imgBlob) => {
-  (async () => {
-    await worker.load();
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
-    await worker.setParameters({
-      tessedit_char_whitelist: "0123456789",
-    });
-    const {
-      data: { text },
-    } = await worker.recognize(imgBlob);
-    console.log(text);
-    await worker.terminate();
-  })();
-};
+import React, { useEffect, useState } from "react";
+import CardTable from "../components/CardTable";
+import FileChooser from "../components/FileChooser";
 
 export default function Home() {
-  const [cardImg, setCardImg] = useState<string>();
-  const [cardId, setCardId] = useState<Number>();
-
-  const onImageChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      let img = event.target.files[0];
-      setCardImg(URL.createObjectURL(img));
-    }
-  };
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   return (
     <>
-      <Head>
-        <title>Yugioh Price Finder</title>
-        <link rel="icon" href="/favicon.ico" />
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-          href="https://fonts.googleapis.com/css?family=Roboto:300|Domine:400"
-          rel="stylesheet"
-        />
-      </Head>
-
-      <div className="w-4/6 m-auto roboto-300 text-center">
-        <main>
-          <div className="conatiner">
-            <h1 className="domine-400 text-xl my-6 border-b-4 border-indigo-500">
+      <div
+        className={`flex flex-col justify-center space-y-4 ${
+          selectedFiles.length === 0 && "h-screen"
+        }`}
+      >
+        <header className="flex-grow-0">
+          <div className="conatiner border-b-2 bg-blue-900 text-white text-center">
+            <h1 className="domine-400 text-2xl py-6 tracking-wider">
               Yugioh Price Finder
             </h1>
           </div>
-          <div className="py-6">
-            <label htmlFor="cardImg">Select a file</label>
-            <input
-              type="file"
-              id="cardImg"
-              name="cardImg"
-              accept="image/png, image/jpeg"
-              onChange={onImageChange}
-            />
-          </div>
-          {cardImg && <img src={cardImg}></img>}
-          <div className="py-6">
-            <button
-              disabled={cardImg === undefined}
-              onClick={() => extractId(cardImg)}
-              type="button"
-              className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
-            >
-              Find price
-            </button>
+        </header>
+        <main className="roboto-300 flex-grow flex">
+          <div className="w-5/6 m-auto justify-center">
+            <div className="text-center">
+              <FileChooser setFiles={setSelectedFiles} />
+            </div>
+            {selectedFiles.length > 0 && (
+              <div className="py-4">
+                <CardTable files={selectedFiles} />
+              </div>
+            )}
           </div>
         </main>
       </div>
